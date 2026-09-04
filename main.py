@@ -8,7 +8,7 @@ TELEGRAM_TOKEN = "8866562008:AAGy4Qf8qjU36XAGoa0yg2_HWPso61JO4fA"
 
 # (ملاحظة: يفضل لاحقاً تحط مفتاح الجيميني في الـ Environment Variables على Render للأمان،
 # أو تضعه هنا مباشرة مؤقتاً للتجربة)
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "ضع_مفتاح_الجيميني_هنا_إن_أردت")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyCvokebvFGSGH4H7DCIgXumzaQX0DT6nIs")
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
