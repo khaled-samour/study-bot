@@ -4,11 +4,13 @@ from google import genai
 import telebot
 
 # 1. إعدادات التوكن والمفاتيح
-TELEGRAM_TOKEN = "8866562008:AAGy4Qf8qjU36XAGoa0yg2_HWPso61JO4fA"
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
+
 
 # (ملاحظة: يفضل لاحقاً تحط مفتاح الجيميني في الـ Environment Variables على Render للأمان،
 # أو تضعه هنا مباشرة مؤقتاً للتجربة)
-GEMINI_API_KEY = "AIzaSyCvokebvFGSGH4H7DCIgXumzaQX0DT6nIs"
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+
 
 
 
