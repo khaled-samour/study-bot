@@ -2,24 +2,30 @@ import os
 import time
 import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
+import telebot
+from google import genai
 
-class SimpleHandler(BaseHTTPRequestHandler):
+# 1. تشغيل سيرفر وهمي فوري وخفيف جداً لإسكات ريندر وفحص البورت
+class HealthCheckHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.end_headers()
-        self.wfile.write(b"Bot is alive!")
+        self.wfile.write(b"OK")
+    
+    def log_message(self, format, *args):
+        # بنلغي اللوجات الزيادة عشان ما تعبي الشاشة
+        pass
 
-def run_fake_server():
+def run_server():
     port = int(os.environ.get("PORT", 10000))
-    server = HTTPServer(('0.0.0.0', port), SimpleHandler)
+    server = HTTPServer(('0.0.0.0', port), HealthCheckHandler)
     server.serve_forever()
 
-server_thread = threading.Thread(target=run_fake_server, daemon=True)
+# بدء السيرفر في خيط منفصل عشان يضل البوت شغال جنبه براحته
+server_thread = threading.Thread(target=run_server, daemon=True)
 server_thread.start()
 
-from google import genai
-import telebot
-
+# 2. إعدادات بوت تيليجرام وجيميناي
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
@@ -53,7 +59,7 @@ def handle_ai_debate(message):
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
-                model='gemini-3.6-flash',
+                model='gemini-2.5-flash',  # تم استخدام الإصدار المستقر والمناسب للعمليات
                 contents=f"{SYSTEM_PROMPT}\n\nالمستخدم يقول: {user_text}",
             )
             reply_text = response.text
@@ -72,16 +78,16 @@ def handle_ai_debate(message):
         bot.reply_to(message, reply_text)
     else:
         try:
-            error_report = f"🚨 تنبيه خطأ يا مهندس!."
+            error_report = f"🚨 تنبيه خطأ يا مهندس!\nفشلت كل محاولات الاتصال مع الجيميناي."
             bot.send_message(5035269101, error_report)
         except Exception as sub_e:
             print(f"Failed to send admin alert: {sub_e}")
         
-        user_msg = "حصلت بعض المشاكل التقنية حاول مرة اخرى\nاذا استمرت المشكلة تواصل مع المهندس 0567322381"
+        user_msg = "حصلت بعض المشاكل التقنية حاول مرة اخرى\nاذا استمرت المشكلة تواصل مع المهندس."
         bot.reply_to(message, user_msg)
 
 if __name__ == "__main__":
-    print("البوت بذكائه الحقيقي يعمل الآن...")
+    print("البوت انطلق بنجاح وبقوة...")
     while True:
         try:
             bot.infinity_polling(timeout=10, long_polling_timeout=5)
