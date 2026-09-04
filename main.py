@@ -48,7 +48,7 @@ def handle_ai_debate(message):
   try:
     # توليد الرد باستخدام عقل Gemini الحقيقي مع توجيه الشخصية
     response = client.models.generate_content(
-        model='gemini-2.5-flash',
+        model='gemini-3.6-flash',
         
         contents=f"{SYSTEM_PROMPT}\n\nالمستخدم يقول: {user_text}",
     )
@@ -58,7 +58,15 @@ def handle_ai_debate(message):
 
   except Exception as e:
     print(f"Gemini API Error: {e}")
-    bot.reply_to(message, f"خطأ تقني يا هندسة: {e}")
+    
+    # إرسال تقرير الخطأ إليك شخصياً على التيليجرام
+    error_report = f"🚨 تنبيه خطأ يا مهندس!\nالخطأ اللي صار:\n{e}"
+    bot.send_message(5035269101, error_report)
+    
+    # إرسال رسالة نظيفة ومرتبة للمستخدم
+    reply_text = "عذراً يا هندسة، صار في خطأ تقني مؤقت. تواصل مع المهندس على هذا الرقم: 0567322381"
+    bot.reply_to(message, reply_text)
+      
       
 
 
