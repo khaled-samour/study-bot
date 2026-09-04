@@ -48,7 +48,7 @@ def handle_ai_debate(message):
   try:
     # توليد الرد باستخدام عقل Gemini الحقيقي مع توجيه الشخصية
     response = client.models.generate_content(
-        model='gemini-3.6-flash',
+        model='gemini-2.5-flash',
         
         contents=f"{SYSTEM_PROMPT}\n\nالمستخدم يقول: {user_text}",
     )
