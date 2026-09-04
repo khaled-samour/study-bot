@@ -1,51 +1,71 @@
+import os
 import time
+from google import genai
 import telebot
 
-TOKEN = "8866562008:AAGy4Qf8qjU36XAGoa0yg2_HWPso61JO4fA"
-bot = telebot.TeleBot(TOKEN)
+# 1. إعدادات التوكن والمفاتيح
+TELEGRAM_TOKEN = "8866562008:AAGy4Qf8qjU36XAGoa0yg2_HWPso61JO4fA"
+
+# (ملاحظة: يفضل لاحقاً تحط مفتاح الجيميني في الـ Environment Variables على Render للأمان،
+# أو تضعه هنا مباشرة مؤقتاً للتجربة)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "ضع_مفتاح_الجيميني_هنا_إن_أردت")
+
+bot = telebot.TeleBot(TELEGRAM_TOKEN)
+
+# إعداد عميل Gemini بالنموذج الأقوى والأحدث
+client = genai.Client(api_key=GEMINI_API_KEY)
+
+# شخصية البوت (System Instructions) عشان يضل ضمن إطار "المنطق والجدل الحاد"
+SYSTEM_PROMPT = (
+    "أنت 'حلبة النقاش المنطقي' (Logic and Debate Agent). شخصيتك حادة، ذكية جداً،"
+    " فلسفية، وتحب تفكيك الفرضيات وتحدي الأفكار بعمق واستفزاز فكري محترم."
+    " لا تعطِ إجابات جاهزة أو سطحية، بل ناقش، حُجّ، واطرح أسئلة تفكيكية"
+    " تضرب في صلب الفكرة المطروحة. تحدث باللغة العربية الفصحى دائماً."
+)
 
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
   bot.reply_to(
       message,
-      "أهلاً بك يا هندسة في حلبة النقاش المنطقي المطور! 🔥🧠\n\nأنا الآن مستعد"
-      " لتفكيك أي فرضية تطرحها.\nجرب اطرح فكرة فلسفية، تقنية، أو مجتمعية، ودعنا"
-      " نرى صمود حجتك!",
+      "أهلاً بك يا هندسة في الحلبة الكبرى! 🧠🔥\n\nتم زرع العقل الاصطناعي"
+      " الحقيقي بنجاح.\nاطرح أي فكرة، نظرية، أو معتقد، ولنرى صمود حجتك أمام"
+      " المجهر المنطقي!",
   )
 
 
 @bot.message_handler(func=lambda message: True)
-def handle_debate(message):
-  text = message.text.strip()
+def handle_ai_debate(message):
+  user_text = message.text.strip()
 
-  if "لماذا" in text or "ليه" in text:
-    bot.reply_to(
-        message,
-        f"سؤالك ('{text}') يفترض أن السبب بديهي، لكن ما هو الدليل القاطع على"
-        " هذه الفرضية؟ ألا ترى أن هناك زاوية أخرى لم تدركها بعد؟ 🤔",
+  # إرسال مؤشر أن البوت يكتب/يفكر
+  bot.send_chat_action(message.chat.id, 'typing')
+
+  try:
+    # توليد الرد باستخدام عقل Gemini الحقيقي مع توجيه الشخصية
+    response = client.models.generate_content(
+        model='gemini-2.5-flash',
+        contents=f"{SYSTEM_PROMPT}\n\nالمستخدم يقول: {user_text}",
     )
-  elif "صح" in text or "خطأ" in text:
+
+    reply_text = response.text
+    bot.reply_to(message, reply_text)
+
+  except Exception as e:
+    print(f"Gemini API Error: {e}")
     bot.reply_to(
         message,
-        f"حكمك المطلق بأن الأمر ('{text}') مثير للاهتمام يا هندسة، لكن دعني"
-        " أسألك: ما هو المعيار الذي بنيت عليه هذا الحكم؟ وكيف تستقيم الأمور"
-        " هكذا؟",
-    )
-  else:
-    bot.reply_to(
-        message,
-        f"مغزى كلامك ('{text}') يدفعنا للتأمل بعمق.. دعنا نضع هذه الفكرة تحت"
-        " المجهر: لو افترضنا عكس كلامك تماماً، كيف سيكون شكل الواقع؟",
+        "عذراً يا هندسة، حدث ماس كهربائي في الخلايا العصبية الاصطناعية.. حاول"
+        " مجدداً!",
     )
 
 
 if __name__ == "__main__":
-  print("بوت النقاش المطور يعمل الآن...")
+  print("البوت بذكائه الحقيقي يعمل الآن...")
   while True:
     try:
       bot.infinity_polling(timeout=10, long_polling_timeout=5)
     except Exception as e:
       print(f"Error occurred: {e}")
       time.sleep(5)
-        
+      
