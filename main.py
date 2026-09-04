@@ -40,7 +40,7 @@ def send_welcome(message):
     user_name = message.from_user.first_name
     bot.reply_to(
         message,
-        f"أهلاً بك يا {user_name} \nاطرح أي فكرة، نظرية، أو معتقد، ولنرى صمود حجتك."
+        f"أهلاً بك يا {user_name}  \nاطرح أي فكرة، نظرية، أو معتقد، ولنرى صمود حجتك."
     )
 
 @bot.message_handler(func=lambda message: True)
@@ -67,33 +67,27 @@ def handle_ai_debate(message):
             break
             
         except Exception as e:
-            # اطبع الخطأ الحقيقي بالكامل في اللوجز عشان نشوفه
-            print(f"CRITICAL GEMINI ERROR (Attempt {attempt + 1}): {str(e)}")
+            print(f"Error details: {e}")
             time.sleep(1)
 
     if success:
         bot.reply_to(message, reply_text)
     else:
-        # ابعثلي شو الخطأ اللي بيطلع باللوجز أو جرب ابعث رسالة للبوت وشوف شو بيكتب باللوجز فوراً
+        try:
+            error_report = f"🚨 تنبيه خطأ يا مهندس!"
+            bot.send_message(5035269101, error_report)
+        except Exception as sub_e:
+            print(f"Failed to send admin alert: {sub_e}")
+        
         user_msg = "حصلت بعض المشاكل التقنية حاول مرة اخرى\nاذا استمرت المشكلة تواصل مع المهندس."
         bot.reply_to(message, user_msg)
-        
 
 if __name__ == "__main__":
     print("البوت انطلق بنجاح وبقوة...")
-    try:
-        # إلغاء أي ويبهوك قديم عالق بشكل مستقل أولاً
-        bot.remove_webhook()
-    except Exception as e:
-        print(f"Webhook remove warning: {e}")
-
     while True:
         try:
             bot.infinity_polling(timeout=10, long_polling_timeout=5)
         except Exception as e:
             print(f"Error occurred: {e}")
             time.sleep(5)
-
-            
-            
             
