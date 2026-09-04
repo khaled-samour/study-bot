@@ -30,8 +30,8 @@ def send_welcome(message):
   bot.reply_to(
       message,
       "أهلاً بك يا هندسة في الحلبة الكبرى! "
-      " الحقيقي بنجاح.\nاطرح أي فكرة، نظرية، أو معتقد، ولنرى صمود حجتك أمام"
-      " المجهر المنطقي!",
+      " اطرح أي فكرة، نظرية، أو معتقد، ولنرى صمود حجتك "
+        
   )
 
 
@@ -54,11 +54,8 @@ def handle_ai_debate(message):
 
   except Exception as e:
     print(f"Gemini API Error: {e}")
-    bot.reply_to(
-        message,
-        "عذراً يا هندسة، حدث ماس كهربائي في الخلايا العصبية الاصطناعية.. حاول"
-        " مجدداً!",
-    )
+    bot.reply_to(message, f"خطأ تقني يا هندسة: {e}")
+      
 
 
 if __name__ == "__main__":
