@@ -67,20 +67,17 @@ def handle_ai_debate(message):
             break
             
         except Exception as e:
-            print(f"Error details: {e}")
+            # اطبع الخطأ الحقيقي بالكامل في اللوجز عشان نشوفه
+            print(f"CRITICAL GEMINI ERROR (Attempt {attempt + 1}): {str(e)}")
             time.sleep(1)
 
     if success:
         bot.reply_to(message, reply_text)
     else:
-        try:
-            error_report = f"🚨 تنبيه خطأ يا مهندس!"
-            bot.send_message(5035269101, error_report)
-        except Exception as sub_e:
-            print(f"Failed to send admin alert: {sub_e}")
-        
+        # ابعثلي شو الخطأ اللي بيطلع باللوجز أو جرب ابعث رسالة للبوت وشوف شو بيكتب باللوجز فوراً
         user_msg = "حصلت بعض المشاكل التقنية حاول مرة اخرى\nاذا استمرت المشكلة تواصل مع المهندس."
         bot.reply_to(message, user_msg)
+        
 
 if __name__ == "__main__":
     print("البوت انطلق بنجاح وبقوة...")
