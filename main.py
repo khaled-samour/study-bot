@@ -32,7 +32,7 @@ SYSTEM_PROMPT = (
 def send_welcome(message):
   bot.reply_to(
       message,
-      ". أهلاً بك يا هندسة "
+      "//n أهلاً بك يا هندسة "
       " اطرح أي فكرة، نظرية، أو معتقد، ولنرى صمود حجتك "
         
   )
@@ -53,10 +53,10 @@ def handle_ai_debate(message):
         contents=f"{SYSTEM_PROMPT}\n\nالمستخدم يقول: {user_text}",
     )
 
-  reply_text = response.text
+    reply_text = response.text
     bot.reply_to(message, reply_text)
 
-      except Exception as e:
+  except Exception as e:
         print(f"Gemini API Error: {e}")
         
         # 1. إرسال تقرير الخطأ المفصل لك شخصياً على الخاص
@@ -81,4 +81,4 @@ if __name__ == "__main__":
     except Exception as e:
       print(f"Error occurred: {e}")
       time.sleep(5)
-      
+        
