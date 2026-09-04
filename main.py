@@ -84,13 +84,19 @@ def handle_ai_debate(message):
 
 if __name__ == "__main__":
     print("البوت انطلق بنجاح وبقوة...")
+    try:
+        # إلغاء أي ويبهوك قديم عالق بشكل مستقل أولاً
+        bot.remove_webhook()
+    except Exception as e:
+        print(f"Webhook remove warning: {e}")
+
     while True:
         try:
-            # إضافة remove_webhook لتنظيف أي اتصال قديم عالق مع تيليجرام
-            bot.infinity_polling(timeout=10, long_polling_timeout=5, remove_webhook=True)
+            bot.infinity_polling(timeout=10, long_polling_timeout=5)
         except Exception as e:
             print(f"Error occurred: {e}")
             time.sleep(5)
+
             
             
             
