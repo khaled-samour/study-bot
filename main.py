@@ -32,7 +32,7 @@ SYSTEM_PROMPT = (
 def send_welcome(message):
   bot.reply_to(
       message,
-      "//n أهلاً بك يا هندسة "
+      "\n أهلاً بك يا هندسة "
       " اطرح أي فكرة، نظرية، أو معتقد، ولنرى صمود حجتك "
         
   )
@@ -41,34 +41,51 @@ def send_welcome(message):
 @bot.message_handler(func=lambda message: True)
 def handle_ai_debate(message):
   user_text = message.text.strip()
-
+  
   # إرسال مؤشر أن البوت يكتب/يفكر
   bot.send_chat_action(message.chat.id, 'typing')
 
-  try:
-    # توليد الرد باستخدام عقل Gemini الحقيقي مع توجيه الشخصية
-    response = client.models.generate_content(
-        model='gemini-3.6-flash',
-        
-        contents=f"{SYSTEM_PROMPT}\n\nالمستخدم يقول: {user_text}",
-    )
+  max_retries = 3
+  success = False
+  reply_text = ""
 
-    reply_text = response.text
-    bot.reply_to(message, reply_text)
+  # نظام إعادة المحاولة التلقائي (Retry Loop)
+  for attempt in range(max_retries):
+      try:
+          response = client.models.generate_content(
+              model='gemini-3.6-flash',
+              contents=f"{SYSTEM_PROMPT}\n\nالمستخدم يقول: {user_text}",
+          )
+          reply_text = response.text
+          success = True
+          
+          # لو نجحت المحاولة (سواء الأولى أو بعد إعادة محاولة)
+          if attempt > 0:
+              reply_text = f"بتعذر على التأخير، بس حصلت بعض المشاكل وتم حلها.\n\n{reply_text}"
+          
+          break  # اطلع من اللوب طالما ضبطت الأمور
+          
+      except Exception as e:
+          print(f"Attempt {attempt + 1} failed: {e}")
+          time.sleep(1)  # استراحة ثانية بين كل محاولة والثانية
 
-  except Exception as e:
-        print(f"Gemini API Error: {e}")
-        
-        # 1. إرسال تقرير الخطأ المفصل لك شخصياً على الخاص
-        try:
-            error_report = f"🚨 تنبيه خطأ يا مهندس!\nالخطأ اللي صار:\n{e}"
-            bot.send_message(5035269101, error_report)
-        except Exception as sub_e:
-            print(f"Failed to send admin alert: {sub_e}")
-        
-        # 2. إرسال الرسالة المرتبة للمستخدم
-        user_msg = "حصلت بعض المشاكل التقنية حاول مرة اخرى\nاذا استمرت المشكلة تواصل مع المهندس 0567322381"
-        bot.reply_to(message, user_msg)
+  # إذا نجحت العملية، ابعت الرد للمستخدم
+  if success:
+      bot.reply_to(message, reply_text)
+  
+  # إذا فشلت كل المحاولات للأسف، ابعتلك تقرير ع الخاص ونبه المستخدم
+  else:
+      # 1. إرسال تقرير الخطأ المفصل لك شخصياً على الخاص
+      try:
+          error_report = f"🚨 تنبيه خطأ يا مهندس!\nفشلت كل محاولات الاتصال مع الجيميناي."
+          bot.send_message(5035269101, error_report)
+      except Exception as sub_e:
+          print(f"Failed to send admin alert: {sub_e}")
+      
+      # 2. إرسال رسالة الاعتذار النهائية للمستخدم
+      user_msg = "حصلت بعض المشاكل التقنية حاول مرة اخرى\nاذا استمرت المشكلة تواصل مع المهندس 0567322381"
+      bot.reply_to(message, user_msg)
+      
           
       
 
