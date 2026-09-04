@@ -53,28 +53,23 @@ def handle_ai_debate(message):
         contents=f"{SYSTEM_PROMPT}\n\nالمستخدم يقول: {user_text}",
     )
 
-    reply_text = response.text
+  reply_text = response.text
     bot.reply_to(message, reply_text)
 
-  except Exception as e:
-    print(f"Gemini API Error: {e}")
-    
-    # إرسال تقرير الخطأ إليك شخصياً على التيليجرام
-    except Exception as e:
-    print(f"Gemini API Error: {e}")
-    
-    # 1. إرسال تقرير الخطأ المفصل لك شخصياً على الخاص
-    try:
-        error_report = f"🚨 تنبيه خطأ يا مهندس!\nالخطأ اللي صار:\n{e}"
-        bot.send_message(5035269101, error_report)
-    except Exception as sub_e:
-        print(f"Failed to send admin alert: {sub_e}")
-    
-    # 2. إرسال الرسالة الجديدة المرتبة للمستخدم
-    reply_text = "حصلت بعض المشاكل التقنية حاول مرة اخرى\nاذا استمرت المشكلة تواصل مع المهندس 0567322381"
-    bot.reply_to(message, reply_text)
-    
-      
+      except Exception as e:
+        print(f"Gemini API Error: {e}")
+        
+        # 1. إرسال تقرير الخطأ المفصل لك شخصياً على الخاص
+        try:
+            error_report = f"🚨 تنبيه خطأ يا مهندس!\nالخطأ اللي صار:\n{e}"
+            bot.send_message(5035269101, error_report)
+        except Exception as sub_e:
+            print(f"Failed to send admin alert: {sub_e}")
+        
+        # 2. إرسال الرسالة المرتبة للمستخدم
+        user_msg = "حصلت بعض المشاكل التقنية حاول مرة اخرى\nاذا استمرت المشكلة تواصل مع المهندس 0567322381"
+        bot.reply_to(message, user_msg)
+          
       
 
 
