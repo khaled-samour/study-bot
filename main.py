@@ -2,10 +2,7 @@ import os
 import time
 import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from google import genai
-import telebot
 
-# سيرفر وهمي بسيط عشان Render يضل راضي وما يعطي خطأ البورت
 class SimpleHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -17,9 +14,11 @@ def run_fake_server():
     server = HTTPServer(('0.0.0.0', port), SimpleHandler)
     server.serve_forever()
 
-# تشغيل السيرفر الوهمي في الخلفية
 server_thread = threading.Thread(target=run_fake_server, daemon=True)
 server_thread.start()
+
+from google import genai
+import telebot
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -73,7 +72,7 @@ def handle_ai_debate(message):
         bot.reply_to(message, reply_text)
     else:
         try:
-            error_report = f"🚨 تنبيه خطأ يا مهندس!\nفشلت كل محاولات الاتصال مع الجيميناي."
+            error_report = f"🚨 تنبيه خطأ يا مهندس!\"
             bot.send_message(5035269101, error_report)
         except Exception as sub_e:
             print(f"Failed to send admin alert: {sub_e}")
