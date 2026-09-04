@@ -86,8 +86,11 @@ if __name__ == "__main__":
     print("البوت انطلق بنجاح وبقوة...")
     while True:
         try:
-            bot.infinity_polling(timeout=10, long_polling_timeout=5)
+            # إضافة remove_webhook لتنظيف أي اتصال قديم عالق مع تيليجرام
+            bot.infinity_polling(timeout=10, long_polling_timeout=5, remove_webhook=True)
         except Exception as e:
             print(f"Error occurred: {e}")
             time.sleep(5)
+            
+            
             
