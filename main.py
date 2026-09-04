@@ -5,7 +5,6 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import telebot
 from google import genai
 
-# 1. تشغيل سيرفر وهمي فوري وخفيف جداً لإسكات ريندر وفحص البورت
 class HealthCheckHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -13,7 +12,6 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
         self.wfile.write(b"OK")
     
     def log_message(self, format, *args):
-        # بنلغي اللوجات الزيادة عشان ما تعبي الشاشة
         pass
 
 def run_server():
@@ -21,11 +19,9 @@ def run_server():
     server = HTTPServer(('0.0.0.0', port), HealthCheckHandler)
     server.serve_forever()
 
-# بدء السيرفر في خيط منفصل عشان يضل البوت شغال جنبه براحته
 server_thread = threading.Thread(target=run_server, daemon=True)
 server_thread.start()
 
-# 2. إعدادات بوت تيليجرام وجيميناي
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
@@ -44,7 +40,7 @@ def send_welcome(message):
     user_name = message.from_user.first_name
     bot.reply_to(
         message,
-        f"أهلاً بك يا {user_name} .\nاطرح أي فكرة، نظرية، أو معتقد، ولنرى صمود حجتك."
+        f"أهلاً بك يا {user_name} \nاطرح أي فكرة، نظرية، أو معتقد، ولنرى صمود حجتك."
     )
 
 @bot.message_handler(func=lambda message: True)
@@ -57,15 +53,13 @@ def handle_ai_debate(message):
     reply_text = ""
 
     for attempt in range(max_retries):
-                try:
-            # استخدام الطريقة المباشرة والمضمونة لإرسال النص
+        try:
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
-                contents=f"{SYSTEM_PROMPT}\n\nالمستخدم يقول: {user_text}"
+                contents=f"{SYSTEM_PROMPT}\n\nالمستخدم يقول: {user_text}",
             )
             reply_text = response.text
             success = True
-
             
             if attempt > 0:
                 reply_text = f"بتعذر على التأخير، بس حصلت بعض المشاكل وتم حلها.\n\n{reply_text}"
@@ -73,14 +67,14 @@ def handle_ai_debate(message):
             break
             
         except Exception as e:
-            print(f"Attempt {attempt + 1} failed: {e}")
+            print(f"Error details: {e}")
             time.sleep(1)
 
     if success:
         bot.reply_to(message, reply_text)
     else:
         try:
-            error_report = f"🚨 تنبيه خطأ يا مهندس! "
+            error_report = f"🚨 تنبيه خطأ يا مهندس!"
             bot.send_message(5035269101, error_report)
         except Exception as sub_e:
             print(f"Failed to send admin alert: {sub_e}")
